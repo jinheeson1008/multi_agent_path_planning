@@ -16,3 +16,5 @@ if __name__ == "__main__":
         nmpc.simulate(args.filename)
     else:
         print("Please enter mode the desired mode: velocity_obstacle or nmpc")
+
+velocity_obstacle.simulate(None)
