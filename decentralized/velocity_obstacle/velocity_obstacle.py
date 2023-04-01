@@ -110,22 +110,22 @@ def check_inside(v, Amat, bvec):
 def create_constraints(translation, angle, side):
     # create line
     origin = np.array([0, 0, 1])
-    point = np.array([np.cos(angle), np.sin(angle)])
-    line = np.cross(origin, point)
+    point = np.array([np.cos(angle), np.sin(angle)]) 
+    line = np.cross(origin, point)#  각도와 origin 사이 normal vector 생성
     line = translate_line(line, translation)
 
-    if side == "left":
+    if side == "left": # left면 방향 조정
         line *= -1
 
-    A = line[:2]
-    b = -line[2]
+    A = line[:2] # normal vector
+    b = -line[2] # 최소 거리
 
-    return A, b
+    return A, b # A : line equation, b: 그 거리
 
 
 def translate_line(line, translation):
     matrix = np.eye(3)
-    matrix[2, :2] = -translation[:2]
+    matrix[2, :2] = -translation[:2] # 역변환
     return matrix @ line
 
 
