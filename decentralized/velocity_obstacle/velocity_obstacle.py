@@ -4,7 +4,7 @@ Collision avoidance using Velocity-obstacle method
 author: Ashwin Bose (atb033@github.com)
 """
 
-from utils.multi_robot_plot import plot_robot_and_obstacles
+from utils.multi_robot_plot import plot_robot_and_obstacles,plot_robot_obstacles_and_vos
 from utils.create_obstacles import create_obstacles
 from utils.control import compute_desired_velocity
 import numpy as np
@@ -25,15 +25,23 @@ def simulate(filename):
 
     robot_state = start
     robot_state_history = np.empty((4, NUMBER_OF_TIMESTEPS))
+    vo_Amat_hist = np.empty((np.shape(obstacles)[2]*2 , 2, NUMBER_OF_TIMESTEPS))
+    vo_bvec_hist = np.empty((np.shape(obstacles)[2]*2 , NUMBER_OF_TIMESTEPS))
+    vo_pt_hist = np.empty((np.shape(obstacles)[2],2,NUMBER_OF_TIMESTEPS))
+    vo_disp_hist = np.empty((np.shape(obstacles)[2],1,NUMBER_OF_TIMESTEPS))
     for i in range(NUMBER_OF_TIMESTEPS):
         v_desired = compute_desired_velocity(robot_state, goal, ROBOT_RADIUS, VMAX)
-        control_vel = compute_velocity(
+        control_vel,vo_Amat,vo_bvec,vo_pt,vo_disp = compute_velocity(
             robot_state, obstacles[:, i, :], v_desired)
         robot_state = update_state(robot_state, control_vel)
         robot_state_history[:4, i] = robot_state
-
-    plot_robot_and_obstacles(
-        robot_state_history, obstacles, ROBOT_RADIUS, NUMBER_OF_TIMESTEPS, SIM_TIME, filename)
+        vo_Amat_hist[:,:,i] = vo_Amat
+        vo_bvec_hist[:,i] = vo_bvec
+        vo_pt_hist[:,:,i] = vo_pt
+        vo_disp_hist[:,:,i] = vo_disp
+    plot_robot_obstacles_and_vos(
+        robot_state_history, obstacles, ROBOT_RADIUS, NUMBER_OF_TIMESTEPS, SIM_TIME, filename,vo_Amat_hist,vo_bvec_hist,vo_pt_hist,vo_disp_hist)
+    
 
 
 def compute_velocity(robot, obstacles, v_desired):
@@ -44,6 +52,8 @@ def compute_velocity(robot, obstacles, v_desired):
     number_of_obstacles = np.shape(obstacles)[1]
     Amat = np.empty((number_of_obstacles * 2, 2))
     bvec = np.empty((number_of_obstacles * 2))
+    vo_pt = np.empty((number_of_obstacles,2))
+    vo_disp = np.empty((number_of_obstacles,1))
     for i in range(number_of_obstacles):
         obstacle = obstacles[:, i]
         pB = obstacle[:2]
@@ -65,6 +75,8 @@ def compute_velocity(robot, obstacles, v_desired):
         Atemp, btemp = create_constraints(translation, phi_right, "right")
         Amat[i*2 + 1, :] = Atemp
         bvec[i*2 + 1] = btemp
+        vo_pt[i,:] = vB
+        vo_disp[i,:] = distBA
 
     # Create search-space
     th = np.linspace(0, 2*np.pi, 20)
@@ -87,7 +99,7 @@ def compute_velocity(robot, obstacles, v_desired):
     min_index = np.where(norm == np.amin(norm))[0][0]
     cmd_vel = (v_satisfying_constraints[:, min_index])
 
-    return cmd_vel
+    return cmd_vel , Amat, bvec , vo_pt , vo_disp
 
 
 def check_constraints(v_sample, Amat, bvec):
@@ -118,7 +130,7 @@ def create_constraints(translation, angle, side):
         line *= -1
 
     A = line[:2] # normal vector
-    b = -line[2] # 최소 거리
+    b = -line[2] # 최소 거리(원점 간에)
 
     return A, b # A : line equation, b: 그 거리
 
