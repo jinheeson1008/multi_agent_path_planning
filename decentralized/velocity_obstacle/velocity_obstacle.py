@@ -22,6 +22,8 @@ def simulate(filename):
 
     start = np.array([5, 0, 0, 0])
     goal = np.array([5, 10, 0, 0])
+    start = np.array([5, 5, 0, 0])
+    goal = np.array([5, 5, 0, 0])
 
     robot_state = start
     robot_state_history = np.empty((4, NUMBER_OF_TIMESTEPS))
@@ -59,6 +61,7 @@ def compute_velocity(robot, obstacles, v_desired):
         pB = obstacle[:2]
         vB = obstacle[2:]
         dispBA = pA - pB
+        #dispBA = pB- pA
         distBA = np.linalg.norm(dispBA)
         thetaBA = np.arctan2(dispBA[1], dispBA[0])
         if 2.2 * ROBOT_RADIUS > distBA:
@@ -75,7 +78,7 @@ def compute_velocity(robot, obstacles, v_desired):
         Atemp, btemp = create_constraints(translation, phi_right, "right")
         Amat[i*2 + 1, :] = Atemp
         bvec[i*2 + 1] = btemp
-        vo_pt[i,:] = vB
+        vo_pt[i,:] = pA + vB
         vo_disp[i,:] = distBA
 
     # Create search-space
