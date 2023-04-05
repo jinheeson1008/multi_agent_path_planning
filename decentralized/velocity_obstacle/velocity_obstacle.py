@@ -64,8 +64,8 @@ def compute_velocity(robot, obstacles, v_desired):
         #dispBA = pB- pA
         distBA = np.linalg.norm(dispBA)
         thetaBA = np.arctan2(dispBA[1], dispBA[0])
-        if 2.2 * ROBOT_RADIUS > distBA:
-            distBA = 2.2*ROBOT_RADIUS
+        if 2 * ROBOT_RADIUS > distBA:
+            distBA = 2*ROBOT_RADIUS
         phi_obst = np.arcsin(2.2*ROBOT_RADIUS/distBA)
         phi_left = thetaBA + phi_obst
         phi_right = thetaBA - phi_obst
