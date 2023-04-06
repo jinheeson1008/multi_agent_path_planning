@@ -104,7 +104,8 @@ def plot_robot_obstacles_and_vos(robot, obstacles, robot_radius, num_steps, sim_
             vo_cone_handle=vo_cone_list[j]
             assert isinstance(vo_cone_handle,Wedge)
             vo_cone_handle.set_center((vo_pt_hist[j,0,i],vo_pt_hist[j,1,i]))
-            vo_cone_handle.set_radius(2)
+            vo_cone_handle.set_radius(vo_dist_hist[j,0,i]*100)
+            vo_cone_handle.set_alpha(0.5)
             angle_2 =np.rad2deg(np.arctan2(vo_Amat_hist[2*j+1,1,i],vo_Amat_hist[2*j+1,0,i]))
             angle_1 =np.rad2deg(np.arctan2(vo_Amat_hist[2*j,1,i],vo_Amat_hist[2*j,0,i]))
             angle_not_reverse = angle_2-angle_1<180 if (angle_2-angle_1>=0) else angle_2-angle_1+360 < 180
@@ -117,13 +118,15 @@ def plot_robot_obstacles_and_vos(robot, obstacles, robot_radius, num_steps, sim_
         for j in range(len(obstacle_list)):
             obstacle_list[j].center = (obstacles[0, i, j], obstacles[1, i, j])
         line.set_data(robot[0, :i], robot[1, :i])
+        ax.set_title("Epoch:{}".format(i))
         return [robot_patch] + [line] + obstacle_list
 
     init()
     step = (sim_time / num_steps)
     for i in range(num_steps):
         animate(i)
-        plt.pause(step)
+        plt.pause(step+0.5)
+
 
     # Save animation
     if not filename:

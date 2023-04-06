@@ -22,8 +22,8 @@ def simulate(filename):
 
     start = np.array([5, 0, 0, 0])
     goal = np.array([5, 10, 0, 0])
-    start = np.array([5, 5, 0, 0])
-    goal = np.array([5, 5, 0, 0])
+    #start = np.array([5, 5, 0, 0])
+    #goal = np.array([5, 5, 0, 0])
 
     robot_state = start
     robot_state_history = np.empty((4, NUMBER_OF_TIMESTEPS))
@@ -64,8 +64,8 @@ def compute_velocity(robot, obstacles, v_desired):
         #dispBA = pB- pA
         distBA = np.linalg.norm(dispBA)
         thetaBA = np.arctan2(dispBA[1], dispBA[0])
-        if 2 * ROBOT_RADIUS > distBA:
-            distBA = 2*ROBOT_RADIUS
+        if 2.2 * ROBOT_RADIUS > distBA:
+            distBA = 2.2*ROBOT_RADIUS
         phi_obst = np.arcsin(2.2*ROBOT_RADIUS/distBA)
         phi_left = thetaBA + phi_obst
         phi_right = thetaBA - phi_obst
@@ -78,7 +78,7 @@ def compute_velocity(robot, obstacles, v_desired):
         Atemp, btemp = create_constraints(translation, phi_right, "right")
         Amat[i*2 + 1, :] = Atemp
         bvec[i*2 + 1] = btemp
-        vo_pt[i,:] = pA + vB
+        vo_pt[i,:] = pA - vB
         vo_disp[i,:] = distBA
 
     # Create search-space
@@ -117,7 +117,7 @@ def check_constraints(v_sample, Amat, bvec):
 def check_inside(v, Amat, bvec):
     v_out = []
     for i in range(np.shape(v)[1]):
-        if not ((Amat @ v[:, i] < bvec).all()):
+        if not ((Amat @ v[:, i] -bvec < 0).all()):
             v_out.append(v[:, i])
     return np.array(v_out).T
 
@@ -149,3 +149,11 @@ def update_state(x, v):
     new_state[:2] = x[:2] + v * TIMESTEP
     new_state[-2:] = v
     return new_state
+
+def return_line_eq(x,A_vec,b_sc):
+    y_out = []
+    #A_vec => [a,b], b_sc => c  at ax+by+c=0
+    [a,b,c] = [A_vec[0],A_vec[1],b_sc]
+    for x_elem in range(len(x)):
+        y_out.append(-(a*x_elem +c)/b)
+    return y_out
