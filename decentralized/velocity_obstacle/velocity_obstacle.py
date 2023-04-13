@@ -78,7 +78,7 @@ def compute_velocity(robot, obstacles, v_desired):
         Atemp, btemp = create_constraints(translation, phi_right, "right")
         Amat[i*2 + 1, :] = Atemp
         bvec[i*2 + 1] = btemp
-        vo_pt[i,:] = pA - vB
+        vo_pt[i,:] = pA + vB
         vo_disp[i,:] = distBA
 
     # Create search-space
@@ -153,7 +153,7 @@ def update_state(x, v):
 def return_line_eq(x,A_vec,b_sc):
     y_out = []
     #A_vec => [a,b], b_sc => c  at ax+by+c=0
-    [a,b,c] = [A_vec[0],A_vec[1],b_sc]
+    [a,b,c] = [A_vec[0],A_vec[1],-b_sc]
     for x_elem in range(len(x)):
         y_out.append(-(a*x_elem +c)/b)
     return y_out

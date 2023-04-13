@@ -113,7 +113,7 @@ def plot_robot_obstacles_and_vos(robot, obstacles, robot_radius, num_steps, sim_
         robot_patch.center = (robot[0, i], robot[1, i])
 
         for j in range(len(vo_cone_list)):
-            x_vo_line = np.arange(-10,10)
+            x_vo_line = np.arange(0,20)
             vo_cone_handle=vo_cone_list[j]
             assert isinstance(vo_cone_handle,Wedge)
             vo_cone_handle.set_center((vo_pt_hist[j,0,i],vo_pt_hist[j,1,i]))
@@ -123,14 +123,16 @@ def plot_robot_obstacles_and_vos(robot, obstacles, robot_radius, num_steps, sim_
             angle_1 =np.rad2deg(np.arctan2(vo_Amat_hist[2*j,1,i],vo_Amat_hist[2*j,0,i]))
             angle_not_reverse = angle_2-angle_1<180 if (angle_2-angle_1>=0) else angle_2-angle_1+360 < 180
             if(1):
-                vo_cone_handle.set_theta1(np.rad2deg(np.arctan2(vo_Amat_hist[2*j+1,0,i],vo_Amat_hist[2*j+1,1,i])))
-                vo_cone_handle.set_theta2(np.rad2deg(np.arctan2(vo_Amat_hist[2*j,0,i],vo_Amat_hist[2*j,1,i])))
+                vo_cone_handle.set_theta1(np.rad2deg(np.arctan2(1*vo_Amat_hist[2*j+1,0,i],-1*vo_Amat_hist[2*j+1,1,i])))
+                vo_cone_handle.set_theta2(np.rad2deg(np.arctan2(1*vo_Amat_hist[2*j,0,i],-1*vo_Amat_hist[2*j,1,i])))
             else:
-                vo_cone_handle.set_theta1(np.rad2deg(np.arctan2(vo_Amat_hist[2*j+1,1,i],vo_Amat_hist[2*j+1,0,i])))
-                vo_cone_handle.set_theta2(np.rad2deg(np.arctan2(vo_Amat_hist[2*j,1,i],vo_Amat_hist[2*j,0,i])))
+                vo_cone_handle.set_theta1(np.rad2deg(np.arctan2(vo_Amat_hist[2*j+1,1,i],1*vo_Amat_hist[2*j+1,0,i])))
+                vo_cone_handle.set_theta2(np.rad2deg(np.arctan2(vo_Amat_hist[2*j,1,i],1*vo_Amat_hist[2*j,0,i])))
             if(1):
-                y_vo_line_left = return_line_eq(x_vo_line,vo_Amat_hist[2*j,:,i],vo_bvec_hist[2*j,i],(2*robot[0,i]-vo_pt_hist[j,0,i],2*robot[1,i]-vo_pt_hist[j,1,i]))
-                y_vo_line_right = return_line_eq(x_vo_line,vo_Amat_hist[2*j+1,:,i],vo_bvec_hist[2*j+1,i],(2*robot[0,i]-vo_pt_hist[j,0,i],2*robot[1,i]-vo_pt_hist[j,1,i]))
+                y_vo_line_left = return_line_eq(x_vo_line,vo_Amat_hist[2*j,:,i],-vo_bvec_hist[2*j,i],(vo_pt_hist[j,0,i],vo_pt_hist[j,1,i]))
+                y_vo_line_right = return_line_eq(x_vo_line,vo_Amat_hist[2*j+1,:,i],-vo_bvec_hist[2*j+1,i],(vo_pt_hist[j,0,i],vo_pt_hist[j,1,i]))
+                #y_vo_line_left = return_line_eq(x_vo_line,vo_Amat_hist[2*j,:,i],-vo_bvec_hist[2*j,i])
+                #y_vo_line_right = return_line_eq(x_vo_line,vo_Amat_hist[2*j+1,:,i],-vo_bvec_hist[2*j+1,i])
                 #y_vo_line_left = return_line_eq(x_vo_line,vo_Amat_hist[2*j,:,i],vo_bvec_hist[2*j,i],None,if_left=True)
                 #y_vo_line_right = return_line_eq(x_vo_line,vo_Amat_hist[2*j+1,:,i],vo_bvec_hist[2*j+1,i],None)
                 vo_line_left_list[j].set_data(x_vo_line,y_vo_line_left)
@@ -183,17 +185,17 @@ def return_line_eq(x,A_vec,b_sc,pt=None,if_left=None):
     y_out = []
     #A_vec => [a,b], b_sc => c  at ax+by+c=0
     [a,b,c] = [A_vec[0],A_vec[1],b_sc]
-    for x_elem in range(len(x)):
+    for x_elem in x:
         if(pt is None):
             if(if_left is not True):
-                y_sol=-(a*x_elem -c)/b
+                y_sol=-(a*x_elem +c)/b
             else:
-                y_sol=-(-a*x_elem -c)/b
+                y_sol=-(-a*x_elem +c)/b
         else:
             if(if_left is not True):
-                y_sol= -(a*(x_elem-pt[0])-c)/b + pt[1]
+                y_sol= -(a*(x_elem-pt[0])+c)/b + pt[1]
             else:
-                y_sol= -(-a*(x_elem-pt[0])-c)/b + pt[1]
+                y_sol= -(-a*(x_elem-pt[0])+c)/b + pt[1]
         
         y_out.append(y_sol)
     return y_out
