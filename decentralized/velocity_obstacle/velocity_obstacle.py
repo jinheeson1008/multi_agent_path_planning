@@ -133,7 +133,7 @@ def create_constraints(translation, angle, side):
         line *= -1
 
     A = line[:2] # normal vector
-    b = -line[2] # 최소 거리(원점 간에)
+    b = -line[2] # 최소 거리(원점 간에) # => +bvec
 
     return A, b # A : line equation, b: 그 거리
 
@@ -142,7 +142,7 @@ def translate_line(line, translation):
     matrix = np.eye(3)
     matrix[2, :2] = -translation[:2] # 역변환
     return matrix @ line
-
+    #-> -bvec
 
 def update_state(x, v):
     new_state = np.empty((4))
