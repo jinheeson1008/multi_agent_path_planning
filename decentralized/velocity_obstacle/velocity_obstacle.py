@@ -150,10 +150,3 @@ def update_state(x, v):
     new_state[-2:] = v
     return new_state
 
-def return_line_eq(x,A_vec,b_sc):
-    y_out = []
-    #A_vec => [a,b], b_sc => c  at ax+by+c=0
-    [a,b,c] = [A_vec[0],A_vec[1],-b_sc]
-    for x_elem in range(len(x)):
-        y_out.append(-(a*x_elem +c)/b)
-    return y_out
