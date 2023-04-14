@@ -58,7 +58,7 @@ def plot_robot_and_obstacles(robot, obstacles, robot_radius, num_steps, sim_time
 
 def plot_robot_obstacles_and_vos(robot, obstacles, robot_radius, num_steps, sim_time, filename,vo_Amat_hist,vo_bvec_hist,vo_pt_hist,vo_dist_hist):
     fig = plt.figure()
-    ax = fig.add_subplot(111, autoscale_on=False, xlim=(-20, 20), ylim=(-20, 20))
+    ax = fig.add_subplot(111, autoscale_on=False, xlim=(0, 20), ylim=(0, 20))
     ax.set_aspect('equal')
     ax.grid()
     line, = ax.plot([], [], '--r')
