@@ -60,8 +60,8 @@ def compute_velocity(robot, obstacles, v_desired):
         obstacle = obstacles[:, i]
         pB = obstacle[:2]
         vB = obstacle[2:]
-        dispBA = pA - pB
-        #dispBA = pB- pA
+        #dispBA = pA - pB
+        dispBA = pB- pA
         distBA = np.linalg.norm(dispBA)
         thetaBA = np.arctan2(dispBA[1], dispBA[0])
         if 2.2 * ROBOT_RADIUS > distBA:
@@ -129,7 +129,7 @@ def create_constraints(translation, angle, side):
     line = np.cross(origin, point)#  각도와 origin 사이 normal vector 생성
     line = translate_line(line, translation)
 
-    if side == "left": # left면 방향 조정
+    if side == "right": # left면 방향 조정
         line *= -1
 
     A = line[:2] # normal vector
