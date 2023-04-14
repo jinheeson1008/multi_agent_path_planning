@@ -90,7 +90,7 @@ def plot_robot_obstacles_and_vos(robot, obstacles, robot_radius, num_steps, sim_
         vo_cone_list.append(vo_cone_obj)
         vo_line_l, = ax.plot([],[],'--b')
         vo_line_left_list.append(vo_line_l)
-        vo_line_r, = ax.plot([],[],'--b')
+        vo_line_r, = ax.plot([],[],'--g')
         vo_line_right_list.append(vo_line_r)
 
 
