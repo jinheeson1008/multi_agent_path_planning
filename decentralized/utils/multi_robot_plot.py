@@ -58,7 +58,7 @@ def plot_robot_and_obstacles(robot, obstacles, robot_radius, num_steps, sim_time
 
 def plot_robot_obstacles_and_vos(robot, obstacles, robot_radius, num_steps, sim_time, filename,vo_Amat_hist,vo_bvec_hist,vo_pt_hist,vo_dist_hist):
     fig = plt.figure()
-    ax = fig.add_subplot(111, autoscale_on=False, xlim=(0, 20), ylim=(0, 20))
+    ax = fig.add_subplot(111, autoscale_on=False, xlim=(0, 10), ylim=(0, 10))
     ax.set_aspect('equal')
     ax.grid()
     line, = ax.plot([], [], '--r')
@@ -70,7 +70,7 @@ def plot_robot_obstacles_and_vos(robot, obstacles, robot_radius, num_steps, sim_
         obstacle = Circle((0, 0), robot_radius,
                           facecolor='aqua', edgecolor='black')
         obstacle_list.append(obstacle)
-
+    ax_arrow = ax.arrow(robot[0, 0], robot[1, 0],robot[2,0],robot[3,0],color="black",alpha=1)
     vo_hist_list=[]
     for i in range(np.shape(vo_Amat_hist)[-1]):
         vo_i = []
@@ -102,7 +102,7 @@ def plot_robot_obstacles_and_vos(robot, obstacles, robot_radius, num_steps, sim_
         ax.add_patch(robot_patch)
         for obstacle in obstacle_list:
             ax.add_patch(obstacle)
-
+        ax_arrow.set_data(x=robot[0, 0], y=robot[1, 0],dx=robot[2,0],dy=robot[3,0])
         line.set_data([], [])
         for i in range(len(vo_line_left_list)):
             vo_line_left_list[i].set_data([],[])
@@ -119,6 +119,7 @@ def plot_robot_obstacles_and_vos(robot, obstacles, robot_radius, num_steps, sim_
             vo_cone_handle.set_center((vo_pt_hist[j,0,i],vo_pt_hist[j,1,i]))
             vo_cone_handle.set_radius(vo_dist_hist[j,0,i]*100)
             vo_cone_handle.set_alpha(0.5)
+            ax_arrow.set_data(x=robot[0, i], y=robot[1, i],dx=robot[2,i],dy=robot[3,i])
             obs_loc=(obstacles[0, i, j], obstacles[1, i, j])
             angle_to_obs = np.rad2deg(np.arctan2(obs_loc[1] - robot[1,i],obs_loc[0]-robot[0,i]))
             angle_2 =[ np.rad2deg(np.arctan2(vo_Amat_hist[2*j+1,0,i], -1 *vo_Amat_hist[2*j+1,1,i])),np.rad2deg(np.arctan2(-1*vo_Amat_hist[2*j+1,0,i], +1 *vo_Amat_hist[2*j+1,1,i]))]
@@ -154,7 +155,7 @@ def plot_robot_obstacles_and_vos(robot, obstacles, robot_radius, num_steps, sim_
     step = (sim_time / num_steps)
     for i in range(num_steps):
         animate(i)
-        plt.pause(step)
+        plt.pause(step+0.05)
 
 
     # Save animation
