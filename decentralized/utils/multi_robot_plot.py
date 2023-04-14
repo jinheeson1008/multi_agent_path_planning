@@ -136,8 +136,8 @@ def plot_robot_obstacles_and_vos(robot, obstacles, robot_radius, num_steps, sim_
                 vo_cone_handle.set_theta1(np.rad2deg(np.arctan2(vo_Amat_hist[2*j+1,1,i],1*vo_Amat_hist[2*j+1,0,i])))
                 vo_cone_handle.set_theta2(np.rad2deg(np.arctan2(vo_Amat_hist[2*j,1,i],1*vo_Amat_hist[2*j,0,i])))
             if(1):
-                y_vo_line_left = return_line_eq(x_vo_line,vo_Amat_hist[2*j,:,i],-vo_bvec_hist[2*j,i],(vo_pt_hist[j,0,i],vo_pt_hist[j,1,i]))
-                y_vo_line_right = return_line_eq(x_vo_line,vo_Amat_hist[2*j+1,:,i],-vo_bvec_hist[2*j+1,i],(vo_pt_hist[j,0,i],vo_pt_hist[j,1,i]))
+                y_vo_line_left = return_line_eq(x_vo_line,vo_Amat_hist[2*j,:,i],+vo_bvec_hist[2*j,i],(vo_pt_hist[j,0,i],vo_pt_hist[j,1,i]))
+                y_vo_line_right = return_line_eq(x_vo_line,vo_Amat_hist[2*j+1,:,i],+vo_bvec_hist[2*j+1,i],(vo_pt_hist[j,0,i],vo_pt_hist[j,1,i]))
                 #y_vo_line_left = return_line_eq(x_vo_line,vo_Amat_hist[2*j,:,i],-vo_bvec_hist[2*j,i])
                 #y_vo_line_right = return_line_eq(x_vo_line,vo_Amat_hist[2*j+1,:,i],-vo_bvec_hist[2*j+1,i])
                 #y_vo_line_left = return_line_eq(x_vo_line,vo_Amat_hist[2*j,:,i],vo_bvec_hist[2*j,i],None,if_left=True)

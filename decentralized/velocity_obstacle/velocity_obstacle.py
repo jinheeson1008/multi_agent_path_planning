@@ -117,7 +117,7 @@ def check_constraints(v_sample, Amat, bvec):
 def check_inside(v, Amat, bvec):
     v_out = []
     for i in range(np.shape(v)[1]):
-        if not ((Amat @ v[:, i] -bvec < 0).all()):
+        if not ((Amat @ v[:, i] +bvec < 0).all()):
             v_out.append(v[:, i])
     return np.array(v_out).T
 
@@ -133,7 +133,7 @@ def create_constraints(translation, angle, side):
         line *= -1
 
     A = line[:2] # normal vector
-    b = -line[2] # 최소 거리(원점 간에) # => +bvec
+    b = line[2] # 최소 거리(원점 간에) # => +bvec
 
     return A, b # A : line equation, b: 그 거리
 
