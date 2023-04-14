@@ -150,3 +150,27 @@ def update_state(x, v):
     new_state[-2:] = v
     return new_state
 
+#From : https://github.com/MengGuo/RVO_Py_MAS
+def in_between_angle(theta_right, theta_dif, theta_left):
+    if abs(theta_right - theta_left) <= np.pi:
+        if theta_right <= theta_dif <= theta_left:
+            return True
+        else:
+            return False
+    else:
+        if (theta_left <0) and (theta_right >0):
+            theta_left += 2*np.pi
+            if theta_dif < 0:
+                theta_dif += 2*np.pi
+            if theta_right <= theta_dif <= theta_left:
+                return True
+            else:
+                return False
+        if (theta_left >0) and (theta_right <0):
+            theta_right += 2*np.pi
+            if theta_dif < 0:
+                theta_dif += 2*np.pi
+            if theta_left <= theta_dif <= theta_right:
+                return True
+            else:
+                return False
