@@ -120,12 +120,18 @@ def plot_robot_obstacles_and_vos(robot, obstacles, robot_radius, num_steps, sim_
             vo_cone_handle.set_radius(vo_dist_hist[j,0,i]*100)
             vo_cone_handle.set_alpha(0.5)
             obs_loc=(obstacles[0, i, j], obstacles[1, i, j])
-            angle_2 =np.rad2deg(np.arctan2(vo_Amat_hist[2*j+1,1,i],vo_Amat_hist[2*j+1,0,i]))
-            angle_1 =np.rad2deg(np.arctan2(vo_Amat_hist[2*j,1,i],vo_Amat_hist[2*j,0,i]))
+            angle_to_obs = np.rad2deg(np.arctan2(obs_loc[1] - robot[1,i],obs_loc[0]-robot[0,i]))
+            angle_2 =[ np.rad2deg(np.arctan2(vo_Amat_hist[2*j+1,0,i], -1 *vo_Amat_hist[2*j+1,1,i])),np.rad2deg(np.arctan2(-1*vo_Amat_hist[2*j+1,0,i], +1 *vo_Amat_hist[2*j+1,1,i]))]
+            angle_2 = angle_2[np.argmin([np.abs(angle- angle_to_obs) if np.abs(angle- angle_to_obs)<=180 else 360 - np.abs(angle- angle_to_obs) for angle in angle_2])]
+            angle_1 = [np.rad2deg(np.arctan2(vo_Amat_hist[2*j,0,i],-1 * vo_Amat_hist[2*j,1,i])),np.rad2deg(np.arctan2(-1* vo_Amat_hist[2*j,0,i],+1 * vo_Amat_hist[2*j,1,i]))]
+            angle_1 = angle_1[np.argmin([np.abs(angle- angle_to_obs) if np.abs(angle- angle_to_obs)<=180 else 360 - np.abs(angle- angle_to_obs) for angle in angle_1])]
             angle_not_reverse = angle_2-angle_1<180 if (angle_2-angle_1>=0) else angle_2-angle_1+360 < 180
+            angle_large,angle_small = [np.max([angle_2,angle_1]),np.min([angle_2,angle_1])] if (np.abs(angle_2-angle_1)<=180) else [np.min([angle_2,angle_1]),np.max([angle_2,angle_1])] 
             if(1):
-                vo_cone_handle.set_theta2(np.rad2deg(np.arctan2(1*vo_Amat_hist[2*j+1,0,i],-1*vo_Amat_hist[2*j+1,1,i])))
-                vo_cone_handle.set_theta1(np.rad2deg(np.arctan2(1*vo_Amat_hist[2*j,0,i],-1*vo_Amat_hist[2*j,1,i])))
+                #vo_cone_handle.set_theta2(np.rad2deg(np.arctan2(1*vo_Amat_hist[2*j+1,0,i],-1*vo_Amat_hist[2*j+1,1,i])))
+                #vo_cone_handle.set_theta1(np.rad2deg(np.arctan2(1*vo_Amat_hist[2*j,0,i],-1*vo_Amat_hist[2*j,1,i])))
+                vo_cone_handle.set_theta2(angle_large)
+                vo_cone_handle.set_theta1(angle_small)
             else:
                 vo_cone_handle.set_theta1(np.rad2deg(np.arctan2(vo_Amat_hist[2*j+1,1,i],1*vo_Amat_hist[2*j+1,0,i])))
                 vo_cone_handle.set_theta2(np.rad2deg(np.arctan2(vo_Amat_hist[2*j,1,i],1*vo_Amat_hist[2*j,0,i])))
@@ -148,7 +154,7 @@ def plot_robot_obstacles_and_vos(robot, obstacles, robot_radius, num_steps, sim_
     step = (sim_time / num_steps)
     for i in range(num_steps):
         animate(i)
-        plt.pause(step+0.5)
+        plt.pause(step)
 
 
     # Save animation
