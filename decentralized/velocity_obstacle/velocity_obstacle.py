@@ -8,6 +8,7 @@ from utils.multi_robot_plot import plot_robot_and_obstacles,plot_robot_obstacles
 from utils.create_obstacles import create_obstacles
 from utils.control import compute_desired_velocity
 import numpy as np
+from typing import Union
 
 SIM_TIME = 5.
 TIMESTEP = 0.1
@@ -93,6 +94,11 @@ def compute_velocity(robot, obstacles, v_desired):
     v_sample = np.stack((vx_sample, vy_sample))
 
     v_satisfying_constraints = check_constraints(v_sample, Amat, bvec)
+    
+    v_test = np.array([v_desired]).T
+
+    check_result = check_constraints_single_vel(v_test,Amat,bvec)
+    print("For velocity:{} -> danger result:{},safe result:{}".format(v_test.T,check_result['danger'],check_result['safe']))
 
     # Objective function
     size = np.shape(v_satisfying_constraints)[1]
@@ -107,11 +113,23 @@ def compute_velocity(robot, obstacles, v_desired):
 
 def check_constraints(v_sample, Amat, bvec):
     length = np.shape(bvec)[0]
-
+    
     for i in range(int(length/2)):
         v_sample = check_inside(v_sample, Amat[2*i:2*i+2, :], bvec[2*i:2*i+2])
 
     return v_sample
+
+def check_constraints_single_vel(v_sample:np.ndarray, Amat, bvec):
+    length = np.shape(bvec)[0]
+    v_sample_save = v_sample.copy()
+    safe_count,danger_count=0,0
+    for i in range(int(length/2)):
+            v_sample_result = check_inside(v_sample, Amat[2*i:2*i+2, :], bvec[2*i:2*i+2])
+            if(v_sample_result.shape!=(0,)):
+                safe_count+=1
+            else:
+                danger_count+=1
+    return {'safe':safe_count,'danger':danger_count}
 
 
 def check_inside(v, Amat, bvec):
@@ -120,6 +138,26 @@ def check_inside(v, Amat, bvec):
         if not ((Amat @ v[:, i] +bvec < 0).all()):
             v_out.append(v[:, i])
     return np.array(v_out).T
+
+def check_inside_v2(v, Amat, bvec,return_code:Union[int,str]=0)->Union[tuple,dict]:
+    #Return code 0:safe, 1:danger,2:both
+    v_safe = []
+    v_danger=[]
+    v_safe_counts=[]
+    v_danger_counts=[]
+    for i in range(np.shape(v)[1]):
+        if not ((Amat @ v[:, i] +bvec < 0).all()):
+            v_safe.append(v[:, i])
+            v_safe_counts.append(sum(Amat @ v[:, i] +bvec < 0))
+        else:
+            v_danger.append(v[:, i])
+            v_danger_counts.append(sum(Amat @ v[:, i] +bvec < 0))
+    if(return_code in [2,'both']):
+        return {"danger":(np.array(v_danger).T, v_danger_counts),"safe":(np.array(v_safe).T, v_safe_counts)}
+    elif(return_code in [1,'danger']):
+        return np.array(v_danger).T, v_danger_counts
+    else:
+        return np.array(v_safe).T, v_safe_counts
 
 
 def create_constraints(translation, angle, side):
