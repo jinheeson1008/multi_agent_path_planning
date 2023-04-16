@@ -97,8 +97,8 @@ def compute_velocity(robot, obstacles, v_desired):
     
     v_test = np.array([v_desired]).T
 
-    check_result = check_constraints_single_vel(v_test,Amat,bvec)
-    print("For velocity:{} -> danger result:{},safe result:{}".format(v_test.T,check_result['danger'],check_result['safe']))
+    check_result = check_constraints_single_vel(v_test,Amat,bvec,return_print="Desired")
+    #print("For velocity:{} -> danger result:{},safe result:{}".format(v_test.T,check_result['danger'],check_result['safe']))
 
     # Objective function
     size = np.shape(v_satisfying_constraints)[1]
@@ -107,7 +107,8 @@ def compute_velocity(robot, obstacles, v_desired):
     norm = np.linalg.norm(diffs, axis=0)
     min_index = np.where(norm == np.amin(norm))[0][0]
     cmd_vel = (v_satisfying_constraints[:, min_index])
-
+    check_result2 = check_constraints_single_vel(np.array([cmd_vel]).T,Amat,bvec,return_print="CMD")
+    #print("CMD velocity:{} -> danger result:{},safe result:{}".format(cmd_vel.T,check_result2['danger'],check_result2['safe']))
     return cmd_vel , Amat, bvec , vo_pt , vo_disp
 
 
@@ -119,9 +120,9 @@ def check_constraints(v_sample, Amat, bvec):
 
     return v_sample
 
-def check_constraints_single_vel(v_sample:np.ndarray, Amat, bvec):
+def check_constraints_single_vel(v_sample:np.ndarray, Amat, bvec,return_print:Union[None,str]=None):
     length = np.shape(bvec)[0]
-    v_sample_save = v_sample.copy()
+    if(v_sample.shape[0]!=2 and v_sample.shape[1]==2): v_sample = np.transpose(v_sample)
     safe_count,danger_count=0,0
     for i in range(int(length/2)):
             v_sample_result = check_inside(v_sample, Amat[2*i:2*i+2, :], bvec[2*i:2*i+2])
@@ -129,7 +130,10 @@ def check_constraints_single_vel(v_sample:np.ndarray, Amat, bvec):
                 safe_count+=1
             else:
                 danger_count+=1
-    return {'safe':safe_count,'danger':danger_count}
+    output_dict = {'safe':safe_count,'danger':danger_count}
+    if(return_print is not None): 
+        print("{} velocity:{} -> danger result:{},safe result:{}".format(return_print,v_sample.T,output_dict['danger'],output_dict['safe']))
+    return output_dict
 
 
 def check_inside(v, Amat, bvec):
