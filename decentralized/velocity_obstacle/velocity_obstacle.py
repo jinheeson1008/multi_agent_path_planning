@@ -16,6 +16,7 @@ NUMBER_OF_TIMESTEPS = int(SIM_TIME/TIMESTEP)
 ROBOT_RADIUS = 0.5
 VMAX = 2
 VMIN = 0.2
+VO_METHOD = "RVO" #"VO","RVO"
 
 
 def simulate(filename):
@@ -62,7 +63,9 @@ def compute_velocity(robot, obstacles, v_desired):
         pB = obstacle[:2]
         vB = obstacle[2:]
         #dispBA = pA - pB
+        #VO
         dispBA = pB- pA
+
         distBA = np.linalg.norm(dispBA)
         thetaBA = np.arctan2(dispBA[1], dispBA[0])
         if 2.2 * ROBOT_RADIUS > distBA:
@@ -70,9 +73,11 @@ def compute_velocity(robot, obstacles, v_desired):
         phi_obst = np.arcsin(2.2*ROBOT_RADIUS/distBA)
         phi_left = thetaBA + phi_obst
         phi_right = thetaBA - phi_obst
-
-        # VO
-        translation = vB
+        # RVO :[0.5*(vB[0]+vA[0]), 0.5*(vB[1]+vA[1])]
+        if(VO_METHOD == "RVO"):
+            translation = 0.5*(vB+vA)
+        else: #DEFAULT: "VO"
+            translation = vB
         Atemp, btemp = create_constraints(translation, phi_left, "left")
         Amat[i*2, :] = Atemp
         bvec[i*2] = btemp
