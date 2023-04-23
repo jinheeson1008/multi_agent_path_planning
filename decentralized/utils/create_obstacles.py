@@ -29,6 +29,17 @@ def create_obstacles(sim_time, num_timesteps):
 
     obstacles = np.dstack((obstacles, obst))
 
+    v = -1.5
+    p0 = np.array([3, 12])
+    obst = create_robot(p0, v, np.pi/2, sim_time,
+                        num_timesteps).reshape(4, num_timesteps, 1)
+    obstacles = np.dstack((obstacles, obst))
+    v = 1.75
+    p0 = np.array([0, 10])
+    obst = create_robot(p0, v, 7*np.pi/4, sim_time,
+                        num_timesteps).reshape(4, num_timesteps, 1)
+    obstacles = np.dstack((obstacles, obst))
+
     return obstacles
 
 

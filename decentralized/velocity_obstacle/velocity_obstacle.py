@@ -10,7 +10,7 @@ from utils.control import compute_desired_velocity
 import numpy as np
 from typing import Union
 
-SIM_TIME = 5.
+SIM_TIME = 8.
 TIMESTEP = 0.1
 NUMBER_OF_TIMESTEPS = int(SIM_TIME/TIMESTEP)
 ROBOT_RADIUS = 0.5
