@@ -21,12 +21,16 @@ VO_METHOD = "RVO" #"VO","RVO"
 
 def simulate(filename):
     obstacles = create_obstacles(SIM_TIME, NUMBER_OF_TIMESTEPS)
-
+    global disp_sum
+    disp_sum=0
+    global traj_length
+    traj_length=0
+    global cmd_integral
+    cmd_integral=0
     start = np.array([5, 0, 0, 0])
     goal = np.array([5, 10, 0, 0])
     #start = np.array([5, 5, 0, 0])
     #goal = np.array([5, 5, 0, 0])
-
     robot_state = start
     robot_state_history = np.empty((4, NUMBER_OF_TIMESTEPS))
     vo_Amat_hist = np.empty((np.shape(obstacles)[2]*2 , 2, NUMBER_OF_TIMESTEPS))
@@ -58,6 +62,9 @@ def compute_velocity(robot, obstacles, v_desired):
     bvec = np.empty((number_of_obstacles * 2))
     vo_pt = np.empty((number_of_obstacles,2))
     vo_disp = np.empty((number_of_obstacles,1))
+    global disp_sum
+    global traj_length
+    global cmd_integral
     for i in range(number_of_obstacles):
         obstacle = obstacles[:, i]
         pB = obstacle[:2]
@@ -112,7 +119,13 @@ def compute_velocity(robot, obstacles, v_desired):
     norm = np.linalg.norm(diffs, axis=0)
     min_index = np.where(norm == np.amin(norm))[0][0]
     cmd_vel = (v_satisfying_constraints[:, min_index])
+    
     check_result2 = check_constraints_single_vel(np.array([cmd_vel]).T,Amat,bvec,return_print="CMD")
+    v_disp = v_desired - cmd_vel
+    disp_sum+= np.linalg.norm(v_disp *TIMESTEP)
+    traj_length+=np.linalg.norm(cmd_vel*TIMESTEP)
+    cmd_integral+=np.linalg.norm(v_desired*TIMESTEP)
+    print("Displaced velocity vector:{}, sum of displacement : {:.3f},Total trajectory:{:.3f},cmd_sum:{:3f}".format(v_disp,disp_sum,traj_length,cmd_integral))
     #print("CMD velocity:{} -> danger result:{},safe result:{}".format(cmd_vel.T,check_result2['danger'],check_result2['safe']))
     return cmd_vel , Amat, bvec , vo_pt , vo_disp
 
